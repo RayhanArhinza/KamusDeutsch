@@ -99,6 +99,30 @@
                 placeholder="Kategori (opsional)"
               >
             </div>
+
+            <!-- NEW: Artikel -->
+            <div>
+              <label class="block text-sm font-medium text-neutral-700 mb-1">🧩 Artikel</label>
+              <select id="article" class="w-full px-4 py-2.5 border border-neutral-200 rounded-lg focus:border-accent-500 focus:ring-1 focus:ring-accent-500 transition-all duration-300 bg-white">
+                <option value="">—</option>
+                <option value="der">der</option>
+                <option value="die">die</option>
+                <option value="das">das</option>
+              </select>
+            </div>
+
+            <!-- NEW: Gender -->
+            <div>
+              <label class="block text-sm font-medium text-neutral-700 mb-1">👤 Gender</label>
+              <select id="gender" class="w-full px-4 py-2.5 border border-neutral-200 rounded-lg focus:border-accent-500 focus:ring-1 focus:ring-accent-500 transition-all duration-300 bg-white">
+                <option value="">—</option>
+                <option value="Maskulin">Maskulin</option>
+                <option value="Feminin">Feminin</option>
+                <option value="Netral">Netral</option>
+                <option value="Plural">Plural</option>
+              </select>
+            </div>
+
             <div>
               <label class="block text-sm font-medium text-neutral-700 mb-1">💬 Contoh Kalimat</label>
               <textarea 
@@ -129,16 +153,14 @@
             <input 
               type="text" 
               id="search" 
-              placeholder="Cari kosakata, kategori, atau contoh..." 
+              placeholder="Cari kosakata, kategori, artikel, gender, atau contoh..." 
               class="w-full pl-10 pr-4 py-2.5 border border-neutral-200 rounded-lg focus:border-accent-500 focus:ring-1 focus:ring-accent-500 transition-all duration-300 bg-white"
             >
           </div>
         </div>
 
         <!-- Vocabulary Cards -->
-        <div id="data-container" class="space-y-4 animate-slide-in">
-          <!-- Cards will be inserted here -->
-        </div>
+        <div id="data-container" class="space-y-4 animate-slide-in"></div>
 
         <!-- Pagination -->
         <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -196,6 +218,30 @@
             placeholder="Kategori (opsional)"
           >
         </div>
+
+        <!-- NEW: Artikel -->
+        <div>
+          <label class="block text-sm font-medium text-neutral-700 mb-1">🧩 Artikel</label>
+          <select id="edit-article" class="w-full px-4 py-2.5 border border-neutral-200 rounded-lg focus:border-accent-500 focus:ring-1 focus:ring-accent-500 transition-all duration-300 bg-white">
+            <option value="">—</option>
+            <option value="der">der</option>
+            <option value="die">die</option>
+            <option value="das">das</option>
+          </select>
+        </div>
+
+        <!-- NEW: Gender -->
+        <div>
+          <label class="block text-sm font-medium text-neutral-700 mb-1">👤 Gender</label>
+          <select id="edit-gender" class="w-full px-4 py-2.5 border border-neutral-200 rounded-lg focus:border-accent-500 focus:ring-1 focus:ring-accent-500 transition-all duration-300 bg-white">
+            <option value="">—</option>
+            <option value="Maskulin">Maskulin</option>
+            <option value="Feminin">Feminin</option>
+            <option value="Netral">Netral</option>
+            <option value="Plural">Plural</option>
+          </select>
+        </div>
+
         <div>
           <label class="block text-sm font-medium text-neutral-700 mb-1">💬 Contoh Kalimat</label>
           <textarea 
@@ -224,16 +270,417 @@
     </div>
   </div>
 
-<div id="loadingOverlay" class="fixed inset-0 bg-neutral-50/90 flex items-center justify-center z-50 hidden">
-  <div class="text-center">
-    <div class="w-10 h-10 border-4 border-accent-500/30 border-t-accent-500 rounded-full animate-spin mb-3 mx-auto"></div>
-    <p class="text-neutral-600 text-sm font-medium">Memuat...</p>
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="fixed inset-0 bg-neutral-50/90 flex items-center justify-center z-50 hidden">
+    <div class="text-center">
+      <div class="w-10 h-10 border-4 border-accent-500/30 border-t-accent-500 rounded-full animate-spin mb-3 mx-auto"></div>
+      <p class="text-neutral-600 text-sm font-medium">Memuat...</p>
+    </div>
   </div>
-</div>
-
   <script>
-    const URL = "https://script.google.com/macros/s/AKfycbxhkEhfVgdn2B2cWyXCg6YP2y6-7-2jPc06PXD2BJqfnThdvguoI9rNOrRS9EQs_IJA/exec";
+  const URL = "https://script.google.com/macros/s/AKfycbyXEyNhhRQ19tu0JWYq04H8f_5_AITqJFHywJQvvmCW86Q3Pm8p21BSSv38kKU95Vru/exec";
 
+  const form = document.getElementById('form');
+  const dataContainer = document.getElementById('data-container');
+  const searchInput = document.getElementById('search');
+  const loadingOverlay = document.getElementById('loadingOverlay');
+  const prevPageBtn = document.getElementById('prev-page');
+  const nextPageBtn = document.getElementById('next-page');
+  const pageNumbers = document.getElementById('page-numbers');
+  const pageInfo = document.getElementById('page-info');
+  const totalItems = document.getElementById('total-items');
+
+  const editModal = document.getElementById('editModal');
+  const editForm = document.getElementById('editForm');
+  const editId = document.getElementById('edit-id');
+  const editGerman = document.getElementById('edit-german');
+  const editIndo = document.getElementById('edit-indonesian');
+  const editCategory = document.getElementById('edit-category');
+  const editArticle = document.getElementById('edit-article');
+  const editGender = document.getElementById('edit-gender');
+  const editExample = document.getElementById('edit-example');
+
+  let dataList = [];
+  let currentPage = 1;
+  const itemsPerPage = 5;
+  const maxPageButtons = 3;
+  let lastFilteredCount = 0; // untuk pagination Next/Prev sesuai hasil filter
+
+  const showLoading = () => loadingOverlay.classList.remove('hidden');
+  const hideLoading = () => loadingOverlay.classList.add('hidden');
+
+  const showNotification = (message, type = 'success') => {
+    const notification = document.createElement('div');
+    notification.className = `fixed bottom-4 right-4 px-4 py-2 rounded-lg text-white text-sm font-medium shadow-lg z-50 animate-pop-in ${
+      type === 'success' ? 'bg-accent-500' : 'bg-red-500'
+    }`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    setTimeout(() => {
+      notification.classList.add('opacity-0');
+      setTimeout(() => notification.remove(), 300);
+    }, 3000);
+  };
+
+  const speakText = (text) => {
+    if (!text) return;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'de-DE';
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const fetchData = async () => {
+    try {
+      showLoading();
+      const res = await fetch(URL);
+      dataList = await res.json();
+
+      // ⬇️ Urutkan ascending berdasarkan German (locale Jerman, case-insensitive)
+      dataList.sort((a, b) => (a.german || '').localeCompare(b.german || '', 'de', { sensitivity: 'base' }));
+
+      currentPage = 1;
+      renderData();
+      updatePagination();
+      hideLoading();
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      hideLoading();
+      showNotification('Gagal memuat data. Silakan coba lagi.', 'error');
+    }
+  };
+
+  const renderData = (filter = '') => {
+    dataContainer.innerHTML = '';
+
+    // ⬇️ Filter + urutkan lagi berdasarkan German agar hasil pencarian tetap ascending
+    const f = filter.toLowerCase();
+    const filtered = [...dataList]
+      .filter(item =>
+        (item.german || '').toLowerCase().includes(f) ||
+        (item.indonesian || '').toLowerCase().includes(f) ||
+        (item.category || '').toLowerCase().includes(f) ||
+        (item.article || '').toLowerCase().includes(f) ||
+        (item.gender || '').toLowerCase().includes(f) ||
+        (item.example || '').toLowerCase().includes(f)
+      )
+      .sort((a, b) => (a.german || '').localeCompare(b.german || '', 'de', { sensitivity: 'base' }));
+
+    lastFilteredCount = filtered.length;
+
+    if (filtered.length === 0) {
+      dataContainer.innerHTML = `
+        <div class="bg-white p-6 rounded-xl shadow-md text-center text-neutral-500">
+          <div class="text-3xl mb-2">📝</div>
+          <p class="font-medium">Tidak ada data ditemukan</p>
+          <p class="text-sm">Coba kata kunci lain atau tambah kosakata baru</p>
+        </div>
+      `;
+      totalItems.textContent = '0';
+      pageInfo.textContent = '0-0';
+      pageNumbers.innerHTML = '';
+      prevPageBtn.disabled = true;
+      nextPageBtn.disabled = true;
+      return;
+    }
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedItems = filtered.slice(startIndex, endIndex);
+
+    totalItems.textContent = filtered.length;
+    pageInfo.textContent = `${startIndex + 1}-${Math.min(endIndex, filtered.length)}`;
+
+    paginatedItems.forEach((item) => {
+      const articleDisplay = item.article ? `${item.article} ` : '';
+      const speakWord = (articleDisplay + (item.german || '')).trim();
+      const card = document.createElement('div');
+      card.className = 'bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300';
+      card.innerHTML = `
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="flex-1">
+            <div class="flex items-center space-x-3 mb-2">
+              <button 
+                onclick="speakText('${speakWord.replace(/'/g, "\\'")}')" 
+                class="text-neutral-500 hover:text-accent-600 transition-colors duration-300"
+                title="Dengar pengucapan"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707a1 1 0 011.414 0l2.121 2.121a1 1 0 010 1.414L9.414 12l4.414 4.414a1 1 0 010 1.414l-2.121 2.121a1 1 0 01-1.414 0L5.586 15z" />
+                </svg>
+              </button>
+              <h3 class="font-semibold text-neutral-800">${articleDisplay}${item.german || ''}</h3>
+            </div>
+            <p class="text-neutral-600"><span class="font-medium">Terjemahan:</span> ${item.indonesian || '-'}</p>
+            <p class="text-neutral-600"><span class="font-medium">Kategori:</span> ${item.category || '-'}</p>
+            <p class="text-neutral-600"><span class="font-medium">Artikel:</span> ${item.article || '-'}</p>
+            <p class="text-neutral-600"><span class="font-medium">Gender:</span> ${item.gender || '-'}</p>
+            ${item.example ? `
+              <div class="flex items-center space-x-3 mt-2">
+                <button 
+                  onclick="speakText('${(item.example || '').replace(/'/g, "\\'")}')" 
+                  class="text-neutral-500 hover:text-accent-600 transition-colors duration-300"
+                  title="Dengar contoh kalimat"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707a1 1 0 011.414 0l2.121 2.121a1 1 0 010 1.414L9.414 12l4.414 4.414a1 1 0 010 1.414l-2.121 2.121a1 1 0 01-1.414 0L5.586 15z" />
+                  </svg>
+                </button>
+                <p class="text-neutral-600"><span class="font-medium">Contoh:</span> ${item.example}</p>
+              </div>
+            ` : '<p class="text-neutral-600"><span class="font-medium">Contoh:</span> -</p>'}
+          </div>
+          <div class="flex space-x-2 mt-4 sm:mt-0">
+            <button 
+              onclick="openEditModal(
+                '${item.id}',
+                '${(item.german||'').replace(/'/g, "\\'")}',
+                '${(item.indonesian||'').replace(/'/g, "\\'")}',
+                '${(item.category||'').replace(/'/g, "\\'")}',
+                '${(item.article||'').replace(/'/g, "\\'")}',
+                '${(item.gender||'').replace(/'/g, "\\'")}',
+                '${(item.example||'').replace(/'/g, "\\'")}'
+              )" 
+              class="px-3 py-1.5 text-sm bg-accent-100 text-accent-700 rounded-lg hover:bg-accent-200 transition-all duration-300"
+            >
+              Edit
+            </button>
+            <button 
+              onclick="deleteEntry('${item.id}')" 
+              class="px-3 py-1.5 text-sm bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-all duration-300"
+            >
+              Hapus
+            </button>
+          </div>
+        </div>
+      `;
+      dataContainer.appendChild(card);
+    });
+
+    updatePagination(filtered.length);
+  };
+
+  const updatePagination = (totalItemsCount = dataList.length) => {
+    const totalPages = Math.ceil(totalItemsCount / itemsPerPage) || 1;
+    pageNumbers.innerHTML = '';
+
+    let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+    let endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+
+    if (endPage === totalPages) {
+      startPage = Math.max(1, endPage - maxPageButtons + 1);
+    }
+
+    if (startPage > 1) {
+      const firstButton = document.createElement('button');
+      firstButton.className = 'px-3 py-1.5 rounded-lg bg-neutral-100 text-neutral-600 hover:bg-neutral-200 transition-all duration-300';
+      firstButton.textContent = '1';
+      firstButton.onclick = () => {
+        currentPage = 1;
+        renderData(searchInput.value);
+      };
+      pageNumbers.appendChild(firstButton);
+
+      if (startPage > 2) {
+        const ellipsis = document.createElement('span');
+        ellipsis.className = 'px-3 py-1.5 text-neutral-600';
+        ellipsis.textContent = '...';
+        pageNumbers.appendChild(ellipsis);
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      const button = document.createElement('button');
+      button.className = `px-3 py-1.5 rounded-lg transition-all duration-300 ${
+        i === currentPage
+          ? 'bg-accent-500 text-white'
+          : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+      }`;
+      button.textContent = i;
+      button.onclick = () => {
+        currentPage = i;
+        renderData(searchInput.value);
+      };
+      pageNumbers.appendChild(button);
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        const ellipsis = document.createElement('span');
+        ellipsis.className = 'px-3 py-1.5 text-neutral-600';
+        ellipsis.textContent = '...';
+        pageNumbers.appendChild(ellipsis);
+      }
+
+      const lastButton = document.createElement('button');
+      lastButton.className = 'px-3 py-1.5 rounded-lg bg-neutral-100 text-neutral-600 hover:bg-neutral-200 transition-all duration-300';
+      lastButton.textContent = totalPages;
+      lastButton.onclick = () => {
+        currentPage = totalPages;
+        renderData(searchInput.value);
+      };
+      pageNumbers.appendChild(lastButton);
+    }
+
+    prevPageBtn.disabled = currentPage === 1;
+    nextPageBtn.disabled = currentPage === totalPages;
+  };
+
+  prevPageBtn.addEventListener('click', () => {
+    if (currentPage > 1) {
+      currentPage--;
+      renderData(searchInput.value);
+    }
+  });
+
+  nextPageBtn.addEventListener('click', () => {
+    const totalPages = Math.ceil(lastFilteredCount / itemsPerPage) || 1;
+    if (currentPage < totalPages) {
+      currentPage++;
+      renderData(searchInput.value);
+    }
+  });
+
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const payload = {
+      action: 'create',
+      german: document.getElementById('german').value,
+      indonesian: document.getElementById('indonesian').value,
+      category: document.getElementById('category').value,
+      article: document.getElementById('article').value,
+      gender: document.getElementById('gender').value,
+      example: document.getElementById('example').value
+    };
+    
+    try {
+      showLoading();
+      const response = await fetch(URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+      const result = await response.text();
+      hideLoading();
+      
+      if (response.ok && result === "Success") {
+        form.reset();
+        fetchData();
+        showNotification('Kosakata berhasil ditambahkan!');
+      } else {
+        throw new Error('Failed to add entry: ' + result);
+      }
+    } catch (error) {
+      console.error('Error adding entry:', error);
+      hideLoading();
+      showNotification('Gagal menambahkan kosakata. Silakan coba lagi.', 'error');
+    }
+  };
+
+  let searchTimeout;
+  searchInput.addEventListener("input", e => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      currentPage = 1;
+      renderData(e.target.value);
+    }, 300);
+  });
+
+  function openEditModal(id, german, indonesian, category, article, gender, example) {
+    editId.value = id;
+    editGerman.value = german;
+    editIndo.value = indonesian;
+    editCategory.value = category;
+    editArticle.value = article;
+    editGender.value = gender;
+    editExample.value = example;
+    editModal.classList.remove("hidden");
+  }
+
+  function closeModal() {
+    editModal.classList.add("hidden");
+  }
+
+  editModal.addEventListener('click', (e) => {
+    if (e.target === editModal) closeModal();
+  });
+
+  editForm.onsubmit = async (e) => {
+    e.preventDefault();
+    const payload = {
+      action: 'update',
+      id: editId.value,
+      german: editGerman.value,
+      indonesian: editIndo.value,
+      category: editCategory.value,
+      article: editArticle.value,
+      gender: editGender.value,
+      example: editExample.value
+    };
+    
+    try {
+      showLoading();
+      const response = await fetch(URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+      const result = await response.text();
+      hideLoading();
+      
+      if (response.ok && result === "Updated") {
+        closeModal();
+        fetchData();
+        showNotification('Kosakata berhasil diperbarui!');
+      } else {
+        throw new Error('Failed to update entry: ' + result);
+      }
+    } catch (error) {
+      console.error('Error updating entry:', error);
+      hideLoading();
+      showNotification('Gagal memperbarui kosakata. Silakan coba lagi.', 'error');
+    }
+  };
+
+  async function deleteEntry(id) {
+    if (!confirm("Yakin ingin menghapus kosakata ini?")) return;
+    
+    const payload = { action: 'delete', id };
+    try {
+      showLoading();
+      const response = await fetch(URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+      const result = await response.text();
+      hideLoading();
+      
+      if (response.ok && result === "Deleted") {
+        fetchData();
+        showNotification('Kosakata berhasil dihapus!');
+      } else {
+        throw new Error('Failed to delete entry: ' + result);
+      }
+    } catch (error) {
+      console.error('Error deleting entry:', error);
+      hideLoading();
+      showNotification('Gagal menghapus kosakata. Silakan coba lagi.', 'error');
+    }
+  }
+
+  // initial load
+  fetchData();
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !editModal.classList.contains('hidden')) {
+      closeModal();
+    }
+  });
+</script>
+
+
+  <!-- <script>
+    const URL = "https://script.google.com/macros/s/AKfycbyXEyNhhRQ19tu0JWYq04H8f_5_AITqJFHywJQvvmCW86Q3Pm8p21BSSv38kKU95Vru/exec";
+    
     const form = document.getElementById('form');
     const dataContainer = document.getElementById('data-container');
     const searchInput = document.getElementById('search');
@@ -250,6 +697,8 @@
     const editGerman = document.getElementById('edit-german');
     const editIndo = document.getElementById('edit-indonesian');
     const editCategory = document.getElementById('edit-category');
+    const editArticle = document.getElementById('edit-article');
+    const editGender = document.getElementById('edit-gender');
     const editExample = document.getElementById('edit-example');
 
     let dataList = [];
@@ -267,7 +716,6 @@
       }`;
       notification.textContent = message;
       document.body.appendChild(notification);
-      
       setTimeout(() => {
         notification.classList.add('opacity-0');
         setTimeout(() => notification.remove(), 300);
@@ -301,12 +749,17 @@
 
     const renderData = (filter = '') => {
       dataContainer.innerHTML = '';
-      const filtered = dataList.filter(item =>
-        item.german.toLowerCase().includes(filter.toLowerCase()) ||
-        item.indonesian.toLowerCase().includes(filter.toLowerCase()) ||
-        item.category.toLowerCase().includes(filter.toLowerCase()) ||
-        item.example.toLowerCase().includes(filter.toLowerCase())
-      );
+      const filtered = dataList.filter(item => {
+        const f = filter.toLowerCase();
+        return (
+          (item.german || '').toLowerCase().includes(f) ||
+          (item.indonesian || '').toLowerCase().includes(f) ||
+          (item.category || '').toLowerCase().includes(f) ||
+          (item.article || '').toLowerCase().includes(f) ||
+          (item.gender || '').toLowerCase().includes(f) ||
+          (item.example || '').toLowerCase().includes(f)
+        );
+      });
 
       if (filtered.length === 0) {
         dataContainer.innerHTML = `
@@ -331,7 +784,9 @@
       totalItems.textContent = filtered.length;
       pageInfo.textContent = `${startIndex + 1}-${Math.min(endIndex, filtered.length)}`;
 
-      paginatedItems.forEach((item, index) => {
+      paginatedItems.forEach((item) => {
+        const articleDisplay = item.article ? `${item.article} ` : '';
+        const speakWord = (articleDisplay + (item.german || '')).trim();
         const card = document.createElement('div');
         card.className = 'bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300';
         card.innerHTML = `
@@ -339,7 +794,7 @@
             <div class="flex-1">
               <div class="flex items-center space-x-3 mb-2">
                 <button 
-                  onclick="speakText('${item.german.replace(/'/g, "\\'")}')" 
+                  onclick="speakText('${speakWord.replace(/'/g, "\\'")}')" 
                   class="text-neutral-500 hover:text-accent-600 transition-colors duration-300"
                   title="Dengar pengucapan"
                 >
@@ -347,14 +802,16 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707a1 1 0 011.414 0l2.121 2.121a1 1 0 010 1.414L9.414 12l4.414 4.414a1 1 0 010 1.414l-2.121 2.121a1 1 0 01-1.414 0L5.586 15z" />
                   </svg>
                 </button>
-                <h3 class="font-semibold text-neutral-800">${item.german}</h3>
+                <h3 class="font-semibold text-neutral-800">${articleDisplay}${item.german || ''}</h3>
               </div>
-              <p class="text-neutral-600"><span class="font-medium">Terjemahan:</span> ${item.indonesian}</p>
+              <p class="text-neutral-600"><span class="font-medium">Terjemahan:</span> ${item.indonesian || '-'}</p>
               <p class="text-neutral-600"><span class="font-medium">Kategori:</span> ${item.category || '-'}</p>
+              <p class="text-neutral-600"><span class="font-medium">Artikel:</span> ${item.article || '-'}</p>
+              <p class="text-neutral-600"><span class="font-medium">Gender:</span> ${item.gender || '-'}</p>
               ${item.example ? `
                 <div class="flex items-center space-x-3 mt-2">
                   <button 
-                    onclick="speakText('${item.example.replace(/'/g, "\\'")}')" 
+                    onclick="speakText('${(item.example || '').replace(/'/g, "\\'")}')" 
                     class="text-neutral-500 hover:text-accent-600 transition-colors duration-300"
                     title="Dengar contoh kalimat"
                   >
@@ -368,7 +825,15 @@
             </div>
             <div class="flex space-x-2 mt-4 sm:mt-0">
               <button 
-                onclick="openEditModal('${item.id}', '${item.german.replace(/'/g, "\\'")}', '${item.indonesian.replace(/'/g, "\\'")}', '${item.category.replace(/'/g, "\\'")}', '${item.example.replace(/'/g, "\\'")}')" 
+                onclick="openEditModal(
+                  '${item.id}',
+                  '${(item.german||'').replace(/'/g, "\\'")}',
+                  '${(item.indonesian||'').replace(/'/g, "\\'")}',
+                  '${(item.category||'').replace(/'/g, "\\'")}',
+                  '${(item.article||'').replace(/'/g, "\\'")}',
+                  '${(item.gender||'').replace(/'/g, "\\'")}',
+                  '${(item.example||'').replace(/'/g, "\\'")}'
+                )" 
                 class="px-3 py-1.5 text-sm bg-accent-100 text-accent-700 rounded-lg hover:bg-accent-200 transition-all duration-300"
               >
                 Edit
@@ -475,6 +940,8 @@
         german: document.getElementById('german').value,
         indonesian: document.getElementById('indonesian').value,
         category: document.getElementById('category').value,
+        article: document.getElementById('article').value,
+        gender: document.getElementById('gender').value,
         example: document.getElementById('example').value
       };
       
@@ -510,11 +977,13 @@
       }, 300);
     });
 
-    function openEditModal(id, german, indonesian, category, example) {
+    function openEditModal(id, german, indonesian, category, article, gender, example) {
       editId.value = id;
       editGerman.value = german;
       editIndo.value = indonesian;
       editCategory.value = category;
+      editArticle.value = article;
+      editGender.value = gender;
       editExample.value = example;
       editModal.classList.remove("hidden");
     }
@@ -537,6 +1006,8 @@
         german: editGerman.value,
         indonesian: editIndo.value,
         category: editCategory.value,
+        article: editArticle.value,
+        gender: editGender.value,
         example: editExample.value
       };
       
@@ -600,6 +1071,6 @@
         closeModal();
       }
     });
-  </script>
+  </script> -->
 </body>
 </html>
