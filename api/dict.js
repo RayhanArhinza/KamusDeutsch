@@ -1,9 +1,7 @@
-// api/dict.js
 module.exports = async (req, res) => {
   const GAS_URL = process.env.GAS_URL;
   const GAS_TOKEN = process.env.GAS_TOKEN || '';
 
-  // CORS & preflight
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
@@ -11,7 +9,6 @@ module.exports = async (req, res) => {
     return res.status(204).end();
   }
 
-  // Guard: ENV wajib ada
   if (!GAS_URL) {
     res.status(500).send('Proxy error: GAS_URL env is missing');
     return;
@@ -21,7 +18,6 @@ module.exports = async (req, res) => {
     if (req.method === 'GET') {
       const r = await fetch(`${GAS_URL}?t=${encodeURIComponent(GAS_TOKEN)}`);
       const ct = r.headers.get('content-type') || '';
-      // Apps Script doGet harus balas JSON
       if (!r.ok) {
         const txt = await r.text();
         return res.status(502).send('Upstream error: ' + txt);
@@ -31,7 +27,6 @@ module.exports = async (req, res) => {
         res.setHeader('Access-Control-Allow-Origin', '*');
         return res.status(200).json(data);
       } else {
-        // fallback jika GAS balas text/html (mis. belum set "Anyone")
         const txt = await r.text();
         return res.status(502).send('Upstream not JSON: ' + txt.slice(0, 200));
       }
@@ -43,7 +38,7 @@ module.exports = async (req, res) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(req.body || {}),
       });
-      const txt = await r.text(); // "Success"/"Updated"/"Deleted" atau error text
+      const txt = await r.text(); 
       res.setHeader('Access-Control-Allow-Origin', '*');
       return res.status(r.ok ? 200 : 400).send(txt);
     }
@@ -53,3 +48,4 @@ module.exports = async (req, res) => {
     return res.status(500).send('Proxy error: ' + (e && e.message ? e.message : String(e)));
   }
 };
+
