@@ -1,46 +1,55 @@
-
-export default async function handler(req, res) {
+// api/dict.js
+module.exports = async (req, res) => {
   const GAS_URL = process.env.GAS_URL;
-  const GAS_TOKEN = process.env.GAS_TOKEN; // optional
+  const GAS_TOKEN = process.env.GAS_TOKEN || '';
+
+  // CORS & preflight
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    return res.status(204).end();
+  }
+
+  // Guard: ENV wajib ada
+  if (!GAS_URL) {
+    res.status(500).send('Proxy error: GAS_URL env is missing');
+    return;
+  }
 
   try {
-    const method = req.method;
-
-    // Teruskan GET (list) ke GAS
-    if (method === 'GET') {
-      const r = await fetch(`${GAS_URL}?t=${encodeURIComponent(GAS_TOKEN || '')}`);
-      const data = await r.json();
-      // CORS untuk dipanggil dari browser
-      res.setHeader('Access-Control-Allow-Origin', '*');
-      res.status(200).json(data);
-      return;
+    if (req.method === 'GET') {
+      const r = await fetch(`${GAS_URL}?t=${encodeURIComponent(GAS_TOKEN)}`);
+      const ct = r.headers.get('content-type') || '';
+      // Apps Script doGet harus balas JSON
+      if (!r.ok) {
+        const txt = await r.text();
+        return res.status(502).send('Upstream error: ' + txt);
+      }
+      if (ct.includes('application/json')) {
+        const data = await r.json();
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        return res.status(200).json(data);
+      } else {
+        // fallback jika GAS balas text/html (mis. belum set "Anyone")
+        const txt = await r.text();
+        return res.status(502).send('Upstream not JSON: ' + txt.slice(0, 200));
+      }
     }
 
-    // Teruskan POST (create/update/delete) ke GAS
-    if (method === 'POST') {
-      const r = await fetch(`${GAS_URL}?t=${encodeURIComponent(GAS_TOKEN || '')}`, {
+    if (req.method === 'POST') {
+      const r = await fetch(`${GAS_URL}?t=${encodeURIComponent(GAS_TOKEN)}`, {
         method: 'POST',
-        body: JSON.stringify(req.body),
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(req.body || {}),
       });
-      const text = await r.text(); // GAS kamu balas "Success", "Updated", "Deleted"
+      const txt = await r.text(); // "Success"/"Updated"/"Deleted" atau error text
       res.setHeader('Access-Control-Allow-Origin', '*');
-      res.status(r.ok ? 200 : 400).send(text);
-      return;
+      return res.status(r.ok ? 200 : 400).send(txt);
     }
 
-    // Preflight CORS
-    if (method === 'OPTIONS') {
-      res.setHeader('Access-Control-Allow-Origin', '*');
-      res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-      res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-      res.status(204).end();
-      return;
-    }
-
-    res.status(405).send('Method Not Allowed');
+    return res.status(405).send('Method Not Allowed');
   } catch (e) {
-    res.status(500).send('Proxy error: ' + e.message);
+    return res.status(500).send('Proxy error: ' + (e && e.message ? e.message : String(e)));
   }
-}
-
+};
