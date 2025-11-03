@@ -270,59 +270,60 @@
     </div>
   </main>
 
-  <!-- MODAL EDIT -->
-  <div id="editModal" class="fixed inset-0 z-50 hidden">
-    <div class="absolute inset-0 bg-black/60"></div>
-    <div class="relative max-w-md mx-auto mt-20 px-4">
-      <div class="rounded-2xl border border-white/60 dark:border-white/10 bg-white/80 dark:bg-slate-900/60 backdrop-blur p-6 shadow-xl animate-pop-in">
-        <h3 class="font-display text-xl text-slate-900 dark:text-white mb-4">Edit Kosakata</h3>
-        <form id="editForm" class="space-y-4">
-          <input type="hidden" id="edit-id" />
+ <!-- MODAL EDIT -->
+<div id="editModal" class="fixed inset-0 z-50 hidden flex items-center justify-center">
+  <div class="absolute inset-0 bg-black/60"></div>
+  <div class="relative max-w-md w-full mx-auto px-4 z-10">
+    <div class="rounded-2xl border border-white/60 dark:border-white/10 bg-white/80 dark:bg-slate-900/60 backdrop-blur p-6 shadow-xl animate-pop-in">
+      <h3 class="font-display text-xl text-slate-900 dark:text-white mb-4">Edit Kosakata</h3>
+      <form id="editForm" class="space-y-4">
+        <input type="hidden" id="edit-id" />
+        <div>
+          <label class="block text-xs mb-1">🇩🇪 Bahasa Jerman</label>
+          <input id="edit-german" class="w-full px-4 py-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/50 focus:ring-2 focus:ring-brand-500/40 outline-none"/>
+        </div>
+        <div>
+          <label class="block text-xs mb-1">🇮🇩 Bahasa Indonesia</label>
+          <input id="edit-indonesian" class="w-full px-4 py-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/50 focus:ring-2 focus:ring-brand-500/40 outline-none"/>
+        </div>
+        <div>
+          <label class="block text-xs mb-1">📋 Kategori</label>
+          <input id="edit-category" class="w-full px-4 py-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/50 focus:ring-2 focus:ring-brand-500/40 outline-none"/>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs mb-1">🇩🇪 Bahasa Jerman</label>
-            <input id="edit-german" class="w-full px-4 py-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/50 focus:ring-2 focus:ring-brand-500/40 outline-none"/>
-          </div>
-          <div>
-            <label class="block text-xs mb-1">🇮🇩 Bahasa Indonesia</label>
-            <input id="edit-indonesian" class="w-full px-4 py-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/50 focus:ring-2 focus:ring-brand-500/40 outline-none"/>
-          </div>
-          <div>
-            <label class="block text-xs mb-1">📋 Kategori</label>
-            <input id="edit-category" class="w-full px-4 py-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/50 focus:ring-2 focus:ring-brand-500/40 outline-none"/>
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs mb-1">🧩 Artikel</label>
-              <select id="edit-article" class="w-full px-3 py-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/50 focus:ring-2 focus:ring-brand-500/40 outline-none">
-                <option value="">—</option>
-                <option value="der">der</option>
-                <option value="die">die</option>
-                <option value="das">das</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs mb-1">👤 Gender</label>
-              <select id="edit-gender" class="w-full px-3 py-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/50 focus:ring-2 focus:ring-brand-500/40 outline-none">
-                <option value="">—</option>
-                <option value="Maskulin">Maskulin</option>
-                <option value="Feminin">Feminin</option>
-                <option value="Netral">Netral</option>
-                <option value="Plural">Plural</option>
-              </select>
-            </div>
+            <label class="block text-xs mb-1">🧩 Artikel</label>
+            <select id="edit-article" class="w-full px-3 py-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/50 focus:ring-2 focus:ring-brand-500/40 outline-none">
+              <option value="">—</option>
+              <option value="der">der</option>
+              <option value="die">die</option>
+              <option value="das">das</option>
+            </select>
           </div>
           <div>
-            <label class="block text-xs mb-1">💬 Contoh</label>
-            <textarea id="edit-example" rows="3" class="w-full px-4 py-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/50 focus:ring-2 focus:ring-brand-500/40 outline-none"></textarea>
+            <label class="block text-xs mb-1">👤 Gender</label>
+            <select id="edit-gender" class="w-full px-3 py-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/50 focus:ring-2 focus:ring-brand-500/40 outline-none">
+              <option value="">—</option>
+              <option value="Maskulin">Maskulin</option>
+              <option value="Feminin">Feminin</option>
+              <option value="Netral">Netral</option>
+              <option value="Plural">Plural</option>
+            </select>
           </div>
-          <div class="flex justify-end gap-2 pt-1">
-            <button type="button" onclick="closeModal()" class="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800">Batal</button>
-            <button class="px-4 py-2 rounded-lg bg-brand-500 text-white hover:bg-brand-600">Simpan</button>
-          </div>
-        </form>
-      </div>
+        </div>
+        <div>
+          <label class="block text-xs mb-1">💬 Contoh</label>
+          <textarea id="edit-example" rows="3" class="w-full px-4 py-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/50 focus:ring-2 focus:ring-brand-500/40 outline-none"></textarea>
+        </div>
+        <div class="flex justify-end gap-2 pt-1">
+          <button type="button" onclick="closeModal()" class="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800">Batal</button>
+          <button class="px-4 py-2 rounded-lg bg-brand-500 text-white hover:bg-brand-600">Simpan</button>
+        </div>
+      </form>
     </div>
   </div>
+</div>
+
 
   <!-- LOADING OVERLAY -->
   <div id="loadingOverlay" class="hidden fixed inset-0 z-[60] grid place-items-center bg-white/70 dark:bg-slate-950/70 backdrop-blur">
@@ -622,4 +623,5 @@
   </script>
 </body>
 </html>
+
 
