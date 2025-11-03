@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kamus Jerman – Indonesia • Neue</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Poppins', 'ui-sans-serif', 'system-ui'],
+            display: ['Playfair Display', 'serif']
+          },
+          colors: {
+            brand: {
+              50: '#f5f7ff',
+              100: '#e8edff',
+              200: '#c7d3ff',
+              500: '#5568FE',  // futuristik biru
+              600: '#3d51fb',
+              700: '#2f3fcb'
+            },
+            gold: {
+              400: '#eab308',  // klasik emas
+              500: '#ca8a04'
+            },
+          },
+          dropShadow: {
+            glow: ['0 0 10px rgba(85,104,254,.35)', '0 0 30px rgba(234,179,8,.25)']
+          },
+          animation: {
+            'aurora': 'aurora 12s ease-in-out infinite',
+            'float': 'float 6s ease-in-out infinite',
+            'pulse-soft': 'pulseSoft 2s ease-in-out infinite',
+            'slide-in': 'slideIn .35s ease-out',
+            'pop-in': 'popIn .3s ease-out'
+          },
+          keyframes: {
+            aurora: {
+              '0%':   { transform: 'translateY(0) translateX(0)' },
+              '50%':  { transform: 'translateY(10%) translateX(-5%)' },
+              '100%': { transform: 'translateY(0) translateX(0)' }
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-10px)' }
+            },
+            pulseSoft: {
+              '0%, 100%': { boxShadow: '0 0 0 0 rgba(85,104,254,.25)' },
+              '50%': { boxShadow: '0 0 0 10px rgba(85,104,254,0)' }
+            },
+            slideIn: { '0%': {opacity:0, transform:'translateY(10px)'}, '100%': {opacity:1, transform:'translateY(0)'} },
+            popIn: { '0%': {opacity:0, transform:'scale(.98)'}, '100%': {opacity:1, transform:'scale(1)'} }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Dekorasi aurora gradient di background */
+    .aurora {
+      background: radial-gradient(60% 60% at 70% 30%, rgba(85,104,254,.25), transparent 60%),
+                  radial-gradient(40% 50% at 20% 10%, rgba(234,179,8,.18), transparent 60%),
+                  radial-gradient(50% 40% at 80% 80%, rgba(185, 94, 255, .18), transparent 60%);
+      filter: blur(40px);
+    }
+    /* Scrollbar halus */
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-thumb { background: #a5b4fc; border-radius: 10px; }
+    html.dark ::-webkit-scrollbar-thumb { background: #475569; }
+    /* Paksa teks jadi putih saat dark mode */
+    html.dark body { color:#fff; }
+    html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark h5, html.dark h6,
+    html.dark p, html.dark span, html.dark label, html.dark small, html.dark li,
+    html.dark a, html.dark button, html.dark div, html.dark strong, html.dark em {
+      color:#fff !important;
+    }
+    /* Input/select/textarea dan placeholder */
+    html.dark input, html.dark select, html.dark textarea { color:#fff !important; }
+    html.dark ::placeholder { color: rgba(255,255,255,.75) !important; }
+    /* Badge/chip tetap kontras pada dark */
+    html.dark .chip { color:#fff !important; border-color: rgba(255,255,255,.25) !important; background: rgba(255,255,255,.06) !important; }
+    /* Tombol sekunder agar teksnya putih */
+    html.dark .btn-secondary { color:#fff !important; }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-b from-white via-slate-50 to-white text-slate-800 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 transition-colors duration-300">
+  <!-- Layer aurora -->
+  <div aria-hidden="true" class="aurora pointer-events-none fixed inset-0 opacity-70 dark:opacity-60 animate-aurora"></div>
+
+  <!-- NAVBAR -->
+  <nav class="relative z-10 border-b border-slate-200/70 dark:border-slate-700/60 backdrop-blur bg-white/70 dark:bg-slate-900/50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <div class="h-16 flex items-center justify-between">
+        <a href="#" class="group inline-flex items-center gap-3">
+          <div class="h-9 w-9 rounded-xl bg-gradient-to-br from-brand-500 to-gold-400 text-white grid place-items-center drop-shadow-glow animate-float">
+            <span class="text-lg">📖</span>
+          </div>
+          <div class="leading-tight">
+            <p class="font-display text-lg font-semibold tracking-wide text-slate-900 dark:text-white">Kamus DE–ID</p>
+
+          </div>
+        </a>
+
+        <div class="flex items-center gap-2">
+          <button id="themeToggle" class="inline-flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 px-3 py-2 text-sm hover:bg-slate-50 dark:hover:bg-slate-800/60 transition">
+            <svg id="sun" class="h-4 w-4 hidden dark:inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4V2m0 20v-2M4 12H2m20 0h-2M5 5l-1.5-1.5M20.5 20.5 19 19M5 19l-1.5 1.5M20.5 3.5 19 5"/><circle cx="12" cy="12" r="4"/></svg>
+            <svg id="moon" class="h-4 w-4 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            
+          </button>
+          <a href="#form" class="rounded-lg bg-brand-500 hover:bg-brand-600 text-white px-3 py-2 text-sm transition drop-shadow-glow">Tambah</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="relative z-10">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+      <div class="grid lg:grid-cols-2 gap-8 items-center">
+        <div class="animate-slide-in">
+          <h1 class="font-display text-3xl sm:text-4xl md:text-5xl tracking-tight text-slate-900 dark:text-white">
+            Belajar <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-gold-400">kosakata Jerman</span> secara elegan & interaktif
+          </h1>
+          <p class="mt-4 text-slate-600 dark:text-slate-300 max-w-prose">
+            Dibangun tanpa database khusus—hanya Google Sheets + Apps Script, di-host gratis di Vercel. Cepat, ringan, dan siap dikembangkan.
+          </p>
+        </div>
+        <div class="relative animate-pop-in">
+          <div class="absolute -inset-6 rounded-3xl bg-gradient-to-tr from-brand-500/20 via-fuchsia-400/10 to-gold-400/20 blur-2xl"></div>
+          <div class="relative rounded-3xl border border-white/50 dark:border-white/10 bg-white/70 dark:bg-slate-900/40 backdrop-blur p-6 shadow-xl">
+            <div class="flex items-center gap-3">
+              <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-brand-500 to-gold-400 text-white grid place-items-center drop-shadow-glow">🔊</div>
+              <div>
+                <p class="font-medium text-slate-800 dark:text-slate-100">Text-to-Speech</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Dengar pengucapan kata & contoh</p>
+              </div>
+            </div>
+            <div class="mt-4 grid grid-cols-2 gap-3 text-xs text-slate-600 dark:text-slate-300">
+              <div class="rounded-xl border border-slate-200/60 dark:border-slate-700/60 p-3">Filter artikel: der • die • das</div>
+              <div class="rounded-xl border border-slate-200/60 dark:border-slate-700/60 p-3">Kategori & gender tersimpan</div>
+              <div class="rounded-xl border border-slate-200/60 dark:border-slate-700/60 p-3">Pencarian instan</div>
+              <div class="rounded-xl border border-slate-200/60 dark:border-slate-700/60 p-3">Pagination dinamis</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pb-16">
+    <div class="grid lg:grid-cols-[360px,1fr] gap-8">
+      <!-- FORM (glassmorphism card) -->
+      <aside>
+        <div class="rounded-2xl border border-white/60 dark:border-white/10 bg-white/70 dark:bg-slate-900/40 backdrop-blur p-6 shadow-xl animate-pop-in">
+          <h2 class="font-display text-xl text-slate-900 dark:text-white">Tambah Kosakata</h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mb-5">Lengkapi kolom di bawah. Simpel & cepat.</p>
+          <form id="form" class="space-y-4">
+            <div class="grid gap-4">
+              <div>
+                <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">🇩🇪 Bahasa Jerman</label>
+                <input id="german" type="text" required placeholder="Kata dalam bahasa Jerman" class="w-full px-4 py-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/50 focus:ring-2 focus:ring-brand-500/50 outline-none" />
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">🇮🇩 Bahasa Indonesia</label>
+                <input id="indonesian" type="text" required placeholder="Terjemahan bahasa Indonesia" class="w-full px-4 py-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/50 focus:ring-2 focus:ring-brand-500/50 outline-none" />
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">📋 Kategori</label>
+                <input id="category" type="text" placeholder="Mis. makanan, keluarga… (opsional)" class="w-full px-4 py-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/50 focus:ring-2 focus:ring-brand-500/50 outline-none" />
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">🧩 Artikel</label>
+                  <select id="article" class="w-full px-3 py-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/50 focus:ring-2 focus:ring-brand-500/50 outline-none">
+                    <option value="">—</option>
+                    <option value="der">der</option>
+                    <option value="die">die</option>
+                    <option value="das">das</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">👤 Gender</label>
+                  <select id="gender" class="w-full px-3 py-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/50 focus:ring-2 focus:ring-brand-500/50 outline-none">
+                    <option value="">—</option>
+                    <option value="Maskulin">Maskulin</option>
+                    <option value="Feminin">Feminin</option>
+                    <option value="Netral">Netral</option>
+                    <option value="Plural">Plural</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">💬 Contoh Kalimat</label>
+                <textarea id="example" rows="3" placeholder="Contoh kalimat (opsional)" class="w-full px-4 py-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/50 focus:ring-2 focus:ring-brand-500/50 outline-none"></textarea>
+              </div>
+            </div>
+            <button type="submit" class="w-full group rounded-xl bg-gradient-to-r from-brand-500 to-gold-400 text-white py-2.5 font-medium shadow-lg hover:opacity-95 transition drop-shadow-glow">
+              <span class="inline-flex items-center gap-2">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                Tambah
+              </span>
+            </button>
+          </form>
+
+          <!-- Tips -->
+          <div class="mt-5 text-xs text-slate-500 dark:text-slate-400">
+            <p><kbd class="px-1.5 py-0.5 rounded border border-slate-300 dark:border-slate-600 bg-white/50 dark:bg-slate-800/50">/</kbd> untuk fokus ke pencarian • <span class="select-none">ESC</span> menutup modal</p>
+          </div>
+        </div>
+      </aside>
+
+      <!-- LIST & CONTROLS -->
+      <section>
+        <!-- Controls -->
+        <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between mb-4">
+          <div class="relative flex-1 min-w-[220px]">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 21l-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z"/></svg>
+            <input id="search" type="text" placeholder="Cari kata, kategori, artikel, gender, contoh…" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/70 dark:bg-slate-900/50 backdrop-blur focus:ring-2 focus:ring-brand-500/50 outline-none" />
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button data-chip="der" class="chip">der</button>
+            <button data-chip="die" class="chip">die</button>
+            <button data-chip="das" class="chip">das</button>
+            <button data-chip="Maskulin" class="chip">Maskulin</button>
+            <button data-chip="Feminin" class="chip">Feminin</button>
+            <button data-chip="Netral" class="chip">Netral</button>
+            <button data-chip="Plural" class="chip">Plural</button>
+          </div>
+        </div>
+
+        <!-- Sorting & page size -->
+        <div class="flex flex-wrap items-center gap-3 mb-4 text-sm">
+          <label class="inline-flex items-center gap-2">Urutkan:
+            <select id="sortBy" class="px-2 py-1.5 rounded-lg border border-slate-200/70 dark:border-slate-700/60 bg-white/70 dark:bg-slate-900/50 focus:ring-2 focus:ring-brand-500/40 outline-none">
+              <option value="german">A–Z (Jerman)</option>
+              <option value="indonesian">A–Z (Indonesia)</option>
+              <option value="article">Artikel</option>
+              <option value="gender">Gender</option>
+              <option value="category">Kategori</option>
+            </select>
+          </label>
+          <label class="inline-flex items-center gap-2">Per halaman:
+            <select id="pageSize" class="px-2 py-1.5 rounded-lg border border-slate-200/70 dark:border-slate-700/60 bg-white/70 dark:bg-slate-900/50 focus:ring-2 focus:ring-brand-500/40 outline-none">
+              <option>5</option>
+              <option>10</option>
+              <option>20</option>
+            </select>
+          </label>
+        </div>
+
+        <!-- Cards -->
+        <div id="data-container" class="space-y-3"></div>
+
+        <!-- Pagination -->
+        <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm">
+          <div class="text-slate-600 dark:text-slate-300">Menampilkan <span id="page-info">1–5</span> dari <span id="total-items">0</span> entri</div>
+          <div class="flex items-center gap-2">
+            <button id="prev-page" class="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50">Prev</button>
+            <div id="page-numbers" class="flex items-center gap-1"></div>
+            <button id="next-page" class="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50">Next</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- MODAL EDIT -->
+  <div id="editModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/60"></div>
+    <div class="relative max-w-md mx-auto mt-20 px-4">
+      <div class="rounded-2xl border border-white/60 dark:border-white/10 bg-white/80 dark:bg-slate-900/60 backdrop-blur p-6 shadow-xl animate-pop-in">
+        <h3 class="font-display text-xl text-slate-900 dark:text-white mb-4">Edit Kosakata</h3>
+        <form id="editForm" class="space-y-4">
+          <input type="hidden" id="edit-id" />
+          <div>
+            <label class="block text-xs mb-1">🇩🇪 Bahasa Jerman</label>
+            <input id="edit-german" class="w-full px-4 py-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/50 focus:ring-2 focus:ring-brand-500/40 outline-none"/>
+          </div>
+          <div>
+            <label class="block text-xs mb-1">🇮🇩 Bahasa Indonesia</label>
+            <input id="edit-indonesian" class="w-full px-4 py-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/50 focus:ring-2 focus:ring-brand-500/40 outline-none"/>
+          </div>
+          <div>
+            <label class="block text-xs mb-1">📋 Kategori</label>
+            <input id="edit-category" class="w-full px-4 py-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/50 focus:ring-2 focus:ring-brand-500/40 outline-none"/>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs mb-1">🧩 Artikel</label>
+              <select id="edit-article" class="w-full px-3 py-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/50 focus:ring-2 focus:ring-brand-500/40 outline-none">
+                <option value="">—</option>
+                <option value="der">der</option>
+                <option value="die">die</option>
+                <option value="das">das</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs mb-1">👤 Gender</label>
+              <select id="edit-gender" class="w-full px-3 py-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/50 focus:ring-2 focus:ring-brand-500/40 outline-none">
+                <option value="">—</option>
+                <option value="Maskulin">Maskulin</option>
+                <option value="Feminin">Feminin</option>
+                <option value="Netral">Netral</option>
+                <option value="Plural">Plural</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs mb-1">💬 Contoh</label>
+            <textarea id="edit-example" rows="3" class="w-full px-4 py-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/50 focus:ring-2 focus:ring-brand-500/40 outline-none"></textarea>
+          </div>
+          <div class="flex justify-end gap-2 pt-1">
+            <button type="button" onclick="closeModal()" class="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800">Batal</button>
+            <button class="px-4 py-2 rounded-lg bg-brand-500 text-white hover:bg-brand-600">Simpan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOADING OVERLAY -->
+  <div id="loadingOverlay" class="hidden fixed inset-0 z-[60] grid place-items-center bg-white/70 dark:bg-slate-950/70 backdrop-blur">
+    <div class="text-center">
+      <div class="h-10 w-10 border-4 border-brand-500/30 border-t-brand-500 rounded-full animate-spin mx-auto mb-3"></div>
+      <p class="text-sm text-slate-700 dark:text-slate-300">Memuat…</p>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="relative z-10 mt-14 border-t border-slate-200/70 dark:border-slate-700/60">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8 text-center">
+      <div class="flex justify-center gap-5 mb-3">
+        <a href="https://github.com/RayhanArhinza" target="_blank" class="text-slate-600 hover:text-brand-600 dark:text-slate-300 dark:hover:text-brand-400 transition">GitHub</a>
+        <a href="https://www.linkedin.com/in/rayhansanevalarhinza/" target="_blank" class="text-slate-600 hover:text-brand-600 dark:text-slate-300 dark:hover:text-brand-400 transition">LinkedIn</a>
+      </div>
+      <p class="text-xs text-slate-500 dark:text-slate-400">© 2025 • Rayhan Saneval Arhinza • Dibangun dengan Tailwind & Vercel</p>
+    </div>
+  </footer>
+<script src="script.js"></script>
+  <script>
+    // ====== Konfigurasi & Element ======
+    const URL = "/api/dict";
+
+    const dataContainer = document.getElementById('data-container');
+    const searchInput = document.getElementById('search');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const prevPageBtn = document.getElementById('prev-page');
+    const nextPageBtn = document.getElementById('next-page');
+    const pageNumbers = document.getElementById('page-numbers');
+    const pageInfo = document.getElementById('page-info');
+    const totalItems = document.getElementById('total-items');
+    const sortBy = document.getElementById('sortBy');
+    const pageSizeSelect = document.getElementById('pageSize');
+
+    const form = document.getElementById('form');
+
+    const editModal = document.getElementById('editModal');
+    const editForm = document.getElementById('editForm');
+    const editId = document.getElementById('edit-id');
+    const editGerman = document.getElementById('edit-german');
+    const editIndo = document.getElementById('edit-indonesian');
+    const editCategory = document.getElementById('edit-category');
+    const editArticle = document.getElementById('edit-article');
+    const editGender = document.getElementById('edit-gender');
+    const editExample = document.getElementById('edit-example');
+
+    // ====== State ======
+    let dataList = [];
+    let currentPage = 1;
+    let itemsPerPage = 5;
+    const maxPageButtons = 4;
+    let lastFilteredCount = 0;
+
+    // ====== Utils ======
+    const showLoading = () => loadingOverlay.classList.remove('hidden');
+    const hideLoading = () => loadingOverlay.classList.add('hidden');
+
+    const notify = (msg, type = 'ok') => {
+      const el = document.createElement('div');
+      el.className = `fixed bottom-4 right-4 z-[70] px-4 py-2 rounded-xl text-white text-sm shadow-lg animate-pop-in ${type==='ok' ? 'bg-brand-500' : 'bg-red-500'}`;
+      el.textContent = msg;
+      document.body.appendChild(el);
+      setTimeout(() => { el.classList.add('opacity-0'); setTimeout(() => el.remove(), 300) }, 2500);
+    };
+
+    const speak = (text, lang='de-DE') => { if (!text) return; const u = new SpeechSynthesisUtterance(text); u.lang=lang; window.speechSynthesis.speak(u); };
+
+    const byKey = (k) => (a,b) => (a[k]||'').localeCompare(b[k]||'', 'de', {sensitivity:'base'})
+
+    // ====== Theme Toggle (persist) ======
+    const themeToggle = document.getElementById('themeToggle');
+    const root = document.documentElement;
+    const setTheme = (mode) => {
+      if (mode === 'dark') root.classList.add('dark'); else root.classList.remove('dark');
+      localStorage.setItem('theme', mode);
+    };
+    setTheme(localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+    themeToggle.addEventListener('click', () => setTheme(root.classList.contains('dark') ? 'light' : 'dark'));
+
+    // ====== Fetch & Render ======
+    async function fetchData(){
+      try {
+        showLoading();
+        const res = await fetch(URL);
+        dataList = await res.json();
+        render();
+      } catch(e){ console.error(e); notify('Gagal memuat data','err'); }
+      finally { hideLoading(); }
+    }
+
+    function getFilteredSorted(){
+      const q = (searchInput.value || '').toLowerCase();
+      const filtered = dataList.filter(it =>
+        (it.german||'').toLowerCase().includes(q) ||
+        (it.indonesian||'').toLowerCase().includes(q) ||
+        (it.category||'').toLowerCase().includes(q) ||
+        (it.article||'').toLowerCase().includes(q) ||
+        (it.gender||'').toLowerCase().includes(q) ||
+        (it.example||'').toLowerCase().includes(q)
+      );
+
+      const key = sortBy.value || 'german';
+      filtered.sort(byKey(key));
+      return filtered;
+    }
+
+    function render(){
+      const filtered = getFilteredSorted();
+      lastFilteredCount = filtered.length;
+      const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
+      currentPage = Math.min(currentPage, totalPages);
+
+      const start = (currentPage - 1) * itemsPerPage;
+      const end = start + itemsPerPage;
+      const rows = filtered.slice(start, end);
+
+      totalItems.textContent = filtered.length;
+      pageInfo.textContent = filtered.length ? `${start+1}–${Math.min(end, filtered.length)}` : '0–0';
+
+      dataContainer.innerHTML = '';
+
+      if (!rows.length){
+        dataContainer.innerHTML = `<div class="rounded-2xl border border-slate-200 dark:border-slate-700 p-8 text-center text-slate-500 dark:text-slate-400 bg-white/60 dark:bg-slate-900/40">Tidak ada data. Coba kata kunci lain atau tambah kosakata.</div>`;
+      } else {
+        rows.forEach(item => {
+          const articleDisplay = item.article ? `<span class='px-2 py-0.5 rounded-md text-xs border border-slate-200 dark:border-slate-700 bg-white/60 dark:bg-slate-900/50 mr-2'>${item.article}</span>` : '';
+          const speakWord = `${item.article? item.article+' ' : ''}${item.german||''}`.trim();
+
+          const card = document.createElement('div');
+          card.className = 'group rounded-2xl border border-white/60 dark:border-white/10 bg-white/70 dark:bg-slate-900/50 backdrop-blur p-5 shadow hover:shadow-xl transition';
+          card.innerHTML = `
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-1">
+                  ${articleDisplay}
+                  <h3 class="font-semibold text-slate-800 dark:text-slate-100 text-lg">${item.german||''}</h3>
+                  <button title="Dengar pengucapan" class="ml-1 text-slate-500 hover:text-brand-600 dark:hover:text-brand-400" data-say="${speakWord.replace(/'/g, "\\'")}">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M19 7a9 9 0 0 1 0 10"/><path d="M15 9a5 5 0 0 1 0 6"/></svg>
+                  </button>
+                </div>
+                <p class="text-sm text-slate-600 dark:text-slate-300"><span class="font-medium">Terjemahan:</span> ${item.indonesian||'-'}</p>
+                <div class="mt-2 flex flex-wrap gap-2 text-xs">
+                  <span class="px-2 py-1 rounded-md border border-slate-200 dark:border-slate-700 bg-white/60 dark:bg-slate-900/50">Artikel: ${item.article||'-'}</span>
+                  <span class="px-2 py-1 rounded-md border border-slate-200 dark:border-slate-700 bg-white/60 dark:bg-slate-900/50">Gender: ${item.gender||'-'}</span>
+                  <span class="px-2 py-1 rounded-md border border-slate-200 dark:border-slate-700 bg-white/60 dark:bg-slate-900/50">Kategori: ${item.category||'-'}</span>
+                </div>
+                ${item.example ? `
+                  <div class="mt-2 flex items-start gap-2">
+                    <button title="Dengar contoh" class="text-slate-500 hover:text-brand-600 dark:hover:text-brand-400" data-say-ex="${(item.example||'').replace(/'/g, "\\'")}">
+                      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M19 7a9 9 0 0 1 0 10"/><path d="M15 9a5 5 0 0 1 0 6"/></svg>
+                    </button>
+                    <p class="text-sm text-slate-600 dark:text-slate-300"><span class="font-medium">Contoh:</span> ${item.example}</p>
+                  </div>` : '<p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Contoh: –</p>'}
+              </div>
+              <div class="flex gap-2">
+                <button class="px-3 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800" data-edit='${JSON.stringify(item).replace(/'/g, "&apos;")}' >Edit</button>
+                <button class="px-3 py-1.5 text-sm rounded-lg border border-red-300 text-red-700 hover:bg-red-50 dark:border-red-700/50 dark:text-red-300 dark:hover:bg-red-900/20" data-del='${item.id}'>Hapus</button>
+              </div>
+            </div>`;
+
+          dataContainer.appendChild(card);
+        });
+      }
+
+      renderPagination(lastFilteredCount);
+    }
+
+    function renderPagination(total){
+      const totalPages = Math.max(1, Math.ceil(total / itemsPerPage));
+      pageNumbers.innerHTML = '';
+
+      const makeBtn = (label, page, active=false) => {
+        const b = document.createElement('button');
+        b.textContent = label;
+        b.className = `px-3 py-2 rounded-lg border ${active ? 'bg-brand-500 text-white border-brand-500' : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'}`;
+        b.onclick = () => { currentPage = page; render(); };
+        return b;
+      };
+
+      let start = Math.max(1, currentPage - Math.floor(maxPageButtons/2));
+      let end = Math.min(totalPages, start + maxPageButtons - 1);
+      if (end === totalPages) start = Math.max(1, end - maxPageButtons + 1);
+
+      if (start > 1){ pageNumbers.appendChild(makeBtn(1,1,false)); if (start>2){ const span=document.createElement('span'); span.className='px-2'; span.textContent='…'; pageNumbers.appendChild(span); } }
+      for(let i=start;i<=end;i++){ pageNumbers.appendChild(makeBtn(i,i,i===currentPage)); }
+      if (end < totalPages){ if (end < totalPages-1){ const span=document.createElement('span'); span.className='px-2'; span.textContent='…'; pageNumbers.appendChild(span);} pageNumbers.appendChild(makeBtn(totalPages,totalPages,false)); }
+
+      prevPageBtn.disabled = currentPage === 1;
+      nextPageBtn.disabled = currentPage === totalPages;
+    }
+
+    // ====== Events ======
+    let t;
+    searchInput.addEventListener('input', () => { clearTimeout(t); t=setTimeout(()=>{ currentPage=1; render(); }, 250); });
+    sortBy.addEventListener('change', () => { currentPage=1; render(); });
+    pageSizeSelect.addEventListener('change', () => { itemsPerPage = parseInt(pageSizeSelect.value,10) || 5; currentPage=1; render(); });
+
+    document.addEventListener('keydown', (e)=>{ if(e.key==='/' && document.activeElement!==searchInput){ e.preventDefault(); searchInput.focus(); } if(e.key==='Escape' && !editModal.classList.contains('hidden')) closeModal(); });
+
+    prevPageBtn.addEventListener('click', ()=>{ if (currentPage>1){ currentPage--; render(); } });
+    nextPageBtn.addEventListener('click', ()=>{ const totalPages = Math.max(1, Math.ceil(lastFilteredCount/itemsPerPage)); if(currentPage<totalPages){ currentPage++; render(); } });
+
+    // chips filter -> tambahkan kata ke search
+    document.querySelectorAll('[data-chip]').forEach(btn=>{
+      btn.classList.add('px-3','py-1.5','rounded-full','border','border-slate-200','dark:border-slate-700','bg-white/60','dark:bg-slate-900/50','text-slate-700','dark:text-slate-200','hover:bg-slate-50','dark:hover:bg-slate-800','text-xs');
+      btn.addEventListener('click', ()=>{ const v = btn.getAttribute('data-chip'); searchInput.value = v; currentPage=1; render(); });
+    });
+
+    // Delegasi tombol pada kartu
+    dataContainer.addEventListener('click', (e)=>{
+      const sayBtn = e.target.closest('[data-say]');
+      if (sayBtn){ speak(sayBtn.getAttribute('data-say')); }
+      const sayExBtn = e.target.closest('[data-say-ex]');
+      if (sayExBtn){ speak(sayExBtn.getAttribute('data-say-ex')); }
+      const editBtn = e.target.closest('[data-edit]');
+      if (editBtn){ const item = JSON.parse(editBtn.getAttribute('data-edit').replaceAll('&apos;','\'')); openEditModal(item); }
+      const delBtn = e.target.closest('[data-del]');
+      if (delBtn){ deleteEntry(delBtn.getAttribute('data-del')); }
+    });
+
+    // ====== CRUD ======
+    form.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const payload = {
+        action: 'create',
+        german: document.getElementById('german').value,
+        indonesian: document.getElementById('indonesian').value,
+        category: document.getElementById('category').value,
+        article: document.getElementById('article').value,
+        gender: document.getElementById('gender').value,
+        example: document.getElementById('example').value
+      };
+      try{
+        showLoading();
+        const res = await fetch(URL, { method:'POST', body: JSON.stringify(payload) });
+        const result = await res.text();
+        if (res.ok && result === 'Success'){ form.reset(); await fetchData(); notify('Kosakata ditambahkan'); }
+        else throw new Error(result);
+      } catch(err){ console.error(err); notify('Gagal menambah','err'); }
+      finally { hideLoading(); }
+    });
+
+    function openEditModal(item){
+      editId.value = item.id;
+      editGerman.value = item.german || '';
+      editIndo.value = item.indonesian || '';
+      editCategory.value = item.category || '';
+      editArticle.value = item.article || '';
+      editGender.value = item.gender || '';
+      editExample.value = item.example || '';
+      editModal.classList.remove('hidden');
+    }
+    function closeModal(){ editModal.classList.add('hidden'); }
+    window.closeModal = closeModal;
+
+    editForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const payload = {
+        action: 'update',
+        id: editId.value,
+        german: editGerman.value,
+        indonesian: editIndo.value,
+        category: editCategory.value,
+        article: editArticle.value,
+        gender: editGender.value,
+        example: editExample.value
+      };
+      try{
+        showLoading();
+        const res = await fetch(URL, { method:'POST', body: JSON.stringify(payload) });
+        const result = await res.text();
+        if (res.ok && result === 'Updated'){ closeModal(); await fetchData(); notify('Perubahan disimpan'); }
+        else throw new Error(result);
+      } catch(err){ console.error(err); notify('Gagal memperbarui','err'); }
+      finally { hideLoading(); }
+    });
+
+    async function deleteEntry(id){
+      if (!confirm('Yakin ingin menghapus kosakata ini?')) return;
+      try{
+        showLoading();
+        const res = await fetch(URL, { method:'POST', body: JSON.stringify({ action:'delete', id }) });
+        const result = await res.text();
+        if (res.ok && result === 'Deleted'){ await fetchData(); notify('Kosakata terhapus'); }
+        else throw new Error(result);
+      } catch(err){ console.error(err); notify('Gagal menghapus','err'); }
+      finally { hideLoading(); }
+    }
+    window.deleteEntry = deleteEntry; // optional
+
+    // Initial
+    (function init(){
+      itemsPerPage = parseInt(pageSizeSelect.value,10) || 5;
+      fetchData();
+    })();
+  </script>
+</body>
+</html>
