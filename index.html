@@ -45,22 +45,19 @@
   </header>
 
   <main class="frame-wrap">
-    <!-- Satu iframe; src diganti dinamis -->
     <iframe id="view" src="about:blank" referrerpolicy="no-referrer"></iframe>
   </main>
 
   <script>
-    // Konfigurasi mapping tema → file. JANGAN ubah file tema agar desain tetap 100% sama.
     const THEMES = {
-      aurora: 'tema-aurora.html',      // tempel kode #1 ke file ini
-      neobrutal: 'tema-neobrutal.html' // tempel kode #2 ke file ini
+      aurora: 'tema-aurora.html',      
+      neobrutal: 'tema-neobrutal.html' 
     };
 
     const $sel = document.getElementById('theme');
     const $frame = document.getElementById('view');
     const $btnOpen = document.getElementById('openStandalone');
 
-    // Baca preferensi dari query (?theme=aurora|neobrutal) lalu fallback ke localStorage
     const url = new URL(location.href);
     const qTheme = url.searchParams.get('theme');
     const stored = localStorage.getItem('kamus_theme');
@@ -71,7 +68,6 @@
       $sel.value = key;
       localStorage.setItem('kamus_theme', key);
 
-      // Update URL agar bisa dibookmark / dibagikan
       if (pushState) {
         const u = new URL(location.href);
         u.searchParams.set('theme', key);
@@ -83,7 +79,6 @@
       $frame.src = THEMES[key];
     }
 
-    // Ketika iframe selesai load, tampilkan dengan animasi halus
     $frame.addEventListener('load', () => {
       requestAnimationFrame(() => $frame.classList.add('ready'));
     });
@@ -95,14 +90,12 @@
       window.open(href, '_blank', 'noopener,noreferrer');
     });
 
-    // Shortcut keyboard: 1 = aurora, 2 = neo
     window.addEventListener('keydown', (e) => {
       if (e.target.tagName.match(/INPUT|TEXTAREA|SELECT/)) return;
       if (e.key === '1') setTheme('aurora');
       if (e.key === '2') setTheme('neobrutal');
     });
 
-    // Inisialisasi
     setTheme(initial, false);
   </script>
 </body>
