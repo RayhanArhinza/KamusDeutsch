@@ -71,7 +71,7 @@ const ttsStatus = document.getElementById('ttsStatus');
 
 let dataList = [];
 let currentPage = 1;
-let perPage = 5; // default 5
+let perPage = 6; // default 5
 
 // ===== UTILS =====
 let selectedVoice = null;
@@ -412,3 +412,4 @@ if ('speechSynthesis' in window) {
 }
 
 fetchData();
+
