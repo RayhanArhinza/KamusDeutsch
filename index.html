@@ -32,7 +32,7 @@
 </head>
 <body>
   <header class="bar">
-    <div class="brand">Kamus DE–ID</div>
+    <div class="brand">Kamus DE–ID • Theme Switcher</div>
     <div class="spacer"></div>
 
     <label class="hint" for="theme">Tema:</label>
@@ -45,58 +45,9 @@
   </header>
 
   <main class="frame-wrap">
+    <!-- Satu iframe; src diganti dinamis -->
     <iframe id="view" src="about:blank" referrerpolicy="no-referrer"></iframe>
   </main>
-
-  <script>
-    const THEMES = {
-      aurora: 'tema-aurora.html',      
-      neobrutal: 'tema-neobrutal.html' 
-    };
-
-    const $sel = document.getElementById('theme');
-    const $frame = document.getElementById('view');
-    const $btnOpen = document.getElementById('openStandalone');
-
-    const url = new URL(location.href);
-    const qTheme = url.searchParams.get('theme');
-    const stored = localStorage.getItem('kamus_theme');
-    const initial = (qTheme && THEMES[qTheme]) ? qTheme : (stored && THEMES[stored]) ? stored : 'aurora';
-
-    function setTheme(key, pushState = true){
-      if(!THEMES[key]) return;
-      $sel.value = key;
-      localStorage.setItem('kamus_theme', key);
-
-      if (pushState) {
-        const u = new URL(location.href);
-        u.searchParams.set('theme', key);
-        history.replaceState(null, '', u);
-      }
-
-      // Ganti src iframe
-      $frame.classList.remove('ready');
-      $frame.src = THEMES[key];
-    }
-
-    $frame.addEventListener('load', () => {
-      requestAnimationFrame(() => $frame.classList.add('ready'));
-    });
-
-    $sel.addEventListener('change', () => setTheme($sel.value));
-    $btnOpen.addEventListener('click', () => {
-      const key = $sel.value;
-      const href = THEMES[key];
-      window.open(href, '_blank', 'noopener,noreferrer');
-    });
-
-    window.addEventListener('keydown', (e) => {
-      if (e.target.tagName.match(/INPUT|TEXTAREA|SELECT/)) return;
-      if (e.key === '1') setTheme('aurora');
-      if (e.key === '2') setTheme('neobrutal');
-    });
-
-    setTheme(initial, false);
-  </script>
+<script src="js/index.js"></script>
 </body>
 </html>
