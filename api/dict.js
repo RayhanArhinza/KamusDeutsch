@@ -1,5 +1,4 @@
-// pages/api/dict.js  (Next.js)
-// atau /api/dict.js  (project static di Vercel)
+
 export default async function handler(req, res) {
   const GAS_URL = process.env.GAS_URL;
   const GAS_TOKEN = process.env.GAS_TOKEN; // optional
@@ -44,3 +43,4 @@ export default async function handler(req, res) {
     res.status(500).send('Proxy error: ' + e.message);
   }
 }
+
