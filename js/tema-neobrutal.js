@@ -43,7 +43,7 @@ const ttsStatus= document.getElementById('ttsStatus');
 
 let dataList = [];
 let currentPage = 1;
-let itemsPerPage = 5; // default 5
+let itemsPerPage = 6; // default 6
 const maxPageButtons = 4;
 let lastFilteredCount = 0;
 
@@ -383,4 +383,5 @@ if ('speechSynthesis' in window){
 (function init(){
     itemsPerPage = parseInt(pageSizeSelect.value,10) || 5; // default 5
     fetchData();
+
 })();
