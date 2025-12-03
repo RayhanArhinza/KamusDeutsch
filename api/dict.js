@@ -1,51 +1,46 @@
-module.exports = async (req, res) => {
+// pages/api/dict.js  (Next.js)
+// atau /api/dict.js  (project static di Vercel)
+export default async function handler(req, res) {
   const GAS_URL = process.env.GAS_URL;
-  const GAS_TOKEN = process.env.GAS_TOKEN || '';
-
-  if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    return res.status(204).end();
-  }
-
-  if (!GAS_URL) {
-    res.status(500).send('Proxy error: GAS_URL env is missing');
-    return;
-  }
+  const GAS_TOKEN = process.env.GAS_TOKEN; // optional
 
   try {
-    if (req.method === 'GET') {
-      const r = await fetch(`${GAS_URL}?t=${encodeURIComponent(GAS_TOKEN)}`);
-      const ct = r.headers.get('content-type') || '';
-      if (!r.ok) {
-        const txt = await r.text();
-        return res.status(502).send('Upstream error: ' + txt);
-      }
-      if (ct.includes('application/json')) {
-        const data = await r.json();
-        res.setHeader('Access-Control-Allow-Origin', '*');
-        return res.status(200).json(data);
-      } else {
-        const txt = await r.text();
-        return res.status(502).send('Upstream not JSON: ' + txt.slice(0, 200));
-      }
-    }
+    const method = req.method;
 
-    if (req.method === 'POST') {
-      const r = await fetch(`${GAS_URL}?t=${encodeURIComponent(GAS_TOKEN)}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(req.body || {}),
-      });
-      const txt = await r.text(); 
+    // Teruskan GET (list) ke GAS
+    if (method === 'GET') {
+      const r = await fetch(`${GAS_URL}?t=${encodeURIComponent(GAS_TOKEN || '')}`);
+      const data = await r.json();
+      // CORS untuk dipanggil dari browser
       res.setHeader('Access-Control-Allow-Origin', '*');
-      return res.status(r.ok ? 200 : 400).send(txt);
+      res.status(200).json(data);
+      return;
     }
 
-    return res.status(405).send('Method Not Allowed');
-  } catch (e) {
-    return res.status(500).send('Proxy error: ' + (e && e.message ? e.message : String(e)));
-  }
-};
+    // Teruskan POST (create/update/delete) ke GAS
+    if (method === 'POST') {
+      const r = await fetch(`${GAS_URL}?t=${encodeURIComponent(GAS_TOKEN || '')}`, {
+        method: 'POST',
+        body: JSON.stringify(req.body),
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const text = await r.text(); // GAS kamu balas "Success", "Updated", "Deleted"
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.status(r.ok ? 200 : 400).send(text);
+      return;
+    }
 
+    // Preflight CORS
+    if (method === 'OPTIONS') {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+      res.status(204).end();
+      return;
+    }
+
+    res.status(405).send('Method Not Allowed');
+  } catch (e) {
+    res.status(500).send('Proxy error: ' + e.message);
+  }
+}
