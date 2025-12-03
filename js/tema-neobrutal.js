@@ -1,4 +1,6 @@
-const URL = "/api/dict";
+
+const URL = "https://script.google.com/macros/s/AKfycbyXEyNhhRQ19tu0JWYq04H8f_5_AITqJFHywJQvvmCW86Q3Pm8p21BSSv38kKU95Vru/exec";
+
 const dataContainer = document.getElementById('data-container');
 const searchInput = document.getElementById('search');
 const loadingOverlay = document.getElementById('loadingOverlay');
@@ -43,7 +45,7 @@ const ttsStatus= document.getElementById('ttsStatus');
 
 let dataList = [];
 let currentPage = 1;
-let itemsPerPage = 6; // default 6
+let itemsPerPage = 5; // default 5
 const maxPageButtons = 4;
 let lastFilteredCount = 0;
 
@@ -383,5 +385,4 @@ if ('speechSynthesis' in window){
 (function init(){
     itemsPerPage = parseInt(pageSizeSelect.value,10) || 5; // default 5
     fetchData();
-
 })();
